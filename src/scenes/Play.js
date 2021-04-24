@@ -4,6 +4,7 @@ class Play extends Phaser.Scene {
     }
 
     create() {
+        //this is a test
         // reset parameters
         this.barrierSpeed = -450;
         this.barrierSpeedMax = -1000;
