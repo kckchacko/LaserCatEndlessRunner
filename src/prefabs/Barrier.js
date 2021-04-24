@@ -1,4 +1,4 @@
-class Barrier extends Phaser.Physics.Arcade.Sprite {
+class Barrier extends Phaser.Physics.Arcade.Sprite { 
     constructor(scene, velocity) {
         // call Phaser Physics Sprite constructor
         super(scene, game.config.width + paddleWidth, Phaser.Math.Between(paddleHeight/2, game.config.height - paddleHeight/2), 'paddle'); 
