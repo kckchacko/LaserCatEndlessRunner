@@ -4,7 +4,7 @@ class Acceleration extends Phaser.Scene {
     }
 
     create() {
-        // variables and settings
+        // variables and settings, test
         this.ACCELERATION = 500;
         this.DRAG = 200;    // DRAG < ACCELERATION = icy slide
         this.physics.world.gravity.y = 1000;
