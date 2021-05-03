@@ -29,7 +29,7 @@ let config = {
             }
         }
     },
-    scene: [Load, Runner, LaserCatTitle,  Menu]
+    scene: [Load, Runner, End,  Menu]
 };
 
 let game = new Phaser.Game(config);
