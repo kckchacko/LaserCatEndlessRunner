@@ -1,3 +1,25 @@
+class Tree extends Phaser.GameObjects.Sprite {
+    constructor(scene, x, y, texture, frame, pointValue) {
+        super(scene, x, y, texture, frame);
+        scene.add.existing(this);   // add to existing scene
+        this.moveSpeed = 4;         // pixels per frame
+    }
+
+    update() {
+        // move spaceship left
+        this.x -= this.moveSpeed;
+        // wrap around from left edge to right edge
+        if(this.x <= 0 - this.width) {
+            this.reset();
+        } 
+    }
+
+    // position reset
+    reset() {
+        this.x = game.config.width;
+    }
+}
+
 class Runner extends Phaser.Scene {
     constructor() {
         super('laserCatRunnerScene');
@@ -31,8 +53,8 @@ class Runner extends Phaser.Scene {
         // set up my alien son 👽
         //this.alien = this.physics.add.sprite(120, game.config.height/2-tileSize, 'platformer_atlas', 'side').setScale(SCALE);
         this.cat = this.physics.add.sprite(120, game.config.height/2- tileSize, 'cat_atlas','cat_run0001').setScale(SCALE);
-
-
+        //this.tree = this.add.sprite(120, game.config.height- tileSize, 'cat_tower').setScale(SCALE);
+        this.tree = new Tree(this, 300, game.config.height- 100, 'cat_tower', 0).setOrigin(0, 0);
         // create cat animations from texture atlas
         // see: https://photonstorm.github.io/phaser3-docs/Phaser.Types.Animations.html#toc1__anchor
         // key: string, frames: array, frameRate: int, repeat: int
@@ -109,14 +131,15 @@ class Runner extends Phaser.Scene {
 
 		// check if alien is grounded
 	    this.cat.isGrounded = this.cat.body.touching.down;
+        this.tree.update();
 	    // if so, we have jumps to spare
 	    if(this.cat.isGrounded) {
-            this.cat.anims.play('walk', true);
+            //this.cat.anims.play('walk', true);
             this.cat.anims.play('cat_run', true);
 	    	this.jumps = this.MAX_JUMPS;
 	    	this.jumping = false;
 	    } else {
-	    	this.cat.anims.play('jump');
+	    	//this.cat.anims.play('jump');
             this.cat.anims.play('cat_jump');
 	    }
         // allow steady velocity change up to a certain key down duration
