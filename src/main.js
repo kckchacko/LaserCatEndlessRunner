@@ -13,6 +13,7 @@ let cursors;
 let currentScene = 0;
 const SCALE = 0.5;
 const tileSize = 35;
+let KeySPACE, rightKey;
 
 // main game object
 let config = {

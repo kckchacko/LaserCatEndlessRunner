@@ -12,7 +12,7 @@ class Runner extends Phaser.Scene {
         this.physics.world.gravity.y = 2600;
 
         // add tile sprite
-        this.talltrees = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'talltrees').setOrigin(0);
+        this.talltrees = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'lasercat_bg').setOrigin(0);
 
         // print Scene name
         this.add.text(game.config.width/2, 30, 'Scene 5: Endless Strollin\'', { font: '14px Futura', fill: '#00AA11' }).setOrigin(0.5);

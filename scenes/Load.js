@@ -18,7 +18,7 @@ class Load extends Phaser.Scene {
 
         //enemy, cat, & laser are all located within the texture atlas 
         this.load.atlas('cat_atlas', 'lasercatTextureAtlas.png', 'lasercatTextureAtlas.json');
-        //loading audio 
+        //loading audio  
         this.load.audio('sfx_intro', 'lasercatbg_intro.mp3');
         this.load.audio('cat_ded', 'lasercat_ded.mp3');
         this.load.audio('sfx_runnerLoopingBg','lasercat_bg.mp3');
