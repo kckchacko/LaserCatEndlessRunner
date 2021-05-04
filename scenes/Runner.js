@@ -54,7 +54,7 @@ class Runner extends Phaser.Scene {
         //this.alien = this.physics.add.sprite(120, game.config.height/2-tileSize, 'platformer_atlas', 'side').setScale(SCALE);
         this.cat = this.physics.add.sprite(120, game.config.height/2- tileSize, 'cat_atlas','cat_run0001').setScale(SCALE);
         //this.tree = this.add.sprite(120, game.config.height- tileSize, 'cat_tower').setScale(SCALE);
-        this.tree = new Tree(this, 300, game.config.height- 100, 'cat_tower', 0).setOrigin(0, 0);
+        this.tree = new Tree(this, 600, game.config.height- 115, 'cat_tower', 0).setOrigin(0, 0);
         // create cat animations from texture atlas
         // see: https://photonstorm.github.io/phaser3-docs/Phaser.Types.Animations.html#toc1__anchor
         // key: string, frames: array, frameRate: int, repeat: int
@@ -104,24 +104,7 @@ class Runner extends Phaser.Scene {
         // add physics collider
         //this.physics.add.collider(this.alien, this.ground);
         this.physics.add.collider(this.cat, this.ground);
-        // set up Scene switcher
-        this.input.keyboard.on('keydown', (event) => {
-            console.log(event);
-            switch(event.key) {
-                case '1':
-                    console.log("case 1 was triggered");
-                    this.scene.start('menuScene');
-                    break;
-                case '2':
-                    this.scene.start('laserCatRunnerScene');
-                    break;
-                case '3':
-                    this.scene.start('laserCatTitleScene');
-                    break;
-                default:
-                    break;
-            }
-        });
+
     }
 
     update() {
@@ -158,7 +141,22 @@ class Runner extends Phaser.Scene {
 	    	this.jumps--;
 	    	this.jumping = false;
 	    }
+        if(this.checkCollision(this.cat, this.tree)) {
+            this.tree.reset();
+            this.scene.start('endScene');
+        }
 
        
+    }
+    checkCollision(cat, tree) {
+        // simple AABB checking
+        if (cat.x < tree.x + tree.width && 
+            cat.x + cat.width > tree.x && 
+            cat.y < tree.y + tree.height &&
+            cat.height + cat.y > tree. y) {
+                return true;
+        } else {
+            return false;
+        }
     }
 }
