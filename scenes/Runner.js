@@ -12,7 +12,7 @@ class Runner extends Phaser.Scene {
         this.physics.world.gravity.y = 2600;
 
         // add tile sprite
-        this.talltrees = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'lasercat_bg').setOrigin(0);
+        this.talltrees = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'runner_bg').setOrigin(0);
 
         // print Scene name
         this.add.text(game.config.width/2, 30, 'Scene 5: Endless Strollin\'', { font: '14px Futura', fill: '#00AA11' }).setOrigin(0.5);
@@ -29,7 +29,7 @@ class Runner extends Phaser.Scene {
         this.groundScroll = this.add.tileSprite(0, game.config.height-tileSize, game.config.width, tileSize, 'groundScroll').setOrigin(0);
 
         // set up my alien son 👽
-        this.alien = this.physics.add.sprite(120, game.config.height/2-tileSize, 'platformer_atlas', 'side').setScale(SCALE);
+        //this.alien = this.physics.add.sprite(120, game.config.height/2-tileSize, 'platformer_atlas', 'side').setScale(SCALE);
         this.cat = this.physics.add.sprite(120, game.config.height/2- tileSize, 'cat_atlas','cat_run0001').setScale(SCALE);
 
 
@@ -80,7 +80,7 @@ class Runner extends Phaser.Scene {
         cursors = this.input.keyboard.createCursorKeys();
 
         // add physics collider
-        this.physics.add.collider(this.alien, this.ground);
+        //this.physics.add.collider(this.alien, this.ground);
         this.physics.add.collider(this.cat, this.ground);
         // set up Scene switcher
         this.input.keyboard.on('keydown', (event) => {
@@ -108,21 +108,21 @@ class Runner extends Phaser.Scene {
         this.groundScroll.tilePositionX += this.SCROLL_SPEED;
 
 		// check if alien is grounded
-	    this.alien.isGrounded = this.alien.body.touching.down;
+	    this.cat.isGrounded = this.cat.body.touching.down;
 	    // if so, we have jumps to spare
-	    if(this.alien.isGrounded) {
-            this.alien.anims.play('walk', true);
+	    if(this.cat.isGrounded) {
+            this.cat.anims.play('walk', true);
             this.cat.anims.play('cat_run', true);
 	    	this.jumps = this.MAX_JUMPS;
 	    	this.jumping = false;
 	    } else {
-	    	this.alien.anims.play('jump');
+	    	this.cat.anims.play('jump');
             this.cat.anims.play('cat_jump');
 	    }
         // allow steady velocity change up to a certain key down duration
         // see: https://photonstorm.github.io/phaser3-docs/Phaser.Input.Keyboard.html#.DownDuration__anchor
 	    if(this.jumps > 0 && Phaser.Input.Keyboard.DownDuration(cursors.up, 150)) {
-	        this.alien.body.velocity.y = this.JUMP_VELOCITY;
+	        this.cat.body.velocity.y = this.JUMP_VELOCITY;
             this.cat.body.velocity.y = this.JUMP_VELOCITY;
 	        this.jumping = true;
 	        this.upKey.tint = 0xFACADE;
