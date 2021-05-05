@@ -45,7 +45,15 @@ class Runner extends Phaser.Scene {
     constructor() {
         super('laserCatRunnerScene');
     }
-    
+    shoot() {
+        var bullet = this.bullets.get(this.cat.x + 40, this.cat.y);
+        if (bullet) {
+            bullet.setActive(true);
+            bullet.setVisible(true);
+            bullet.body.setAllowGravity(false);
+            bullet.body.velocity.x = 200;
+        }
+    }
     create() {
         // variables and settings
         this.JUMP_VELOCITY = -700;
@@ -58,8 +66,16 @@ class Runner extends Phaser.Scene {
         this.runner_backg = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'runner_bg').setOrigin(0);
 
         // play music 
-        let runner_bgm = this.sound.add('sfx_runnerLoopingBg');
-        runner_bgm.play();
+        // let runner_bgm = this.sound.add('sfx_runnerLoopingBg');
+        // runner_bgm.play();
+        let enemy_dying_sfx = this.sound.add('enemy_ded');
+        this.bgm = this.sound.add('sfx_runnerLoopingBg', { 
+            mute: false,
+            volume: 1,
+            rate: 1,
+            loop: true 
+        });
+        this.bgm.play();
 
         // make ground tiles group
         this.ground = this.add.group();
@@ -74,6 +90,7 @@ class Runner extends Phaser.Scene {
         
         this.cat = this.physics.add.sprite(120, game.config.height/2, 'cat_atlas','cat_run0001.png').setScale(SCALE)
         this.tower = this.physics.add.sprite(400, game.config.height/2, 'cat_tower')
+        this.tower.destroyed = false; 
         ///========================================================vvv changes
         // this.cat = this.physics.add.sprite(120, game.config.height/2- tileSize, 'cat_atlas','cat_run0001').setScale(SCALE);
         // //this.tree = this.add.sprite(120, game.config.height- tileSize, 'cat_tower').setScale(SCALE);
@@ -94,17 +111,19 @@ class Runner extends Phaser.Scene {
             frameRate: 30,
             repeat: -1 
         });
-        // add arrow key graphics as UI
-        this.upKey = this.add.sprite(64, 32, 'arrowKey');
-		this.leftKey = this.add.sprite(32, 64, 'arrowKey');
-		this.downKey = this.add.sprite(64, 64, 'arrowKey');
-		this.rightKey = this.add.sprite(96, 64, 'arrowKey');
-		this.leftKey.rotation = Math.PI/2*3;
-		this.downKey.rotation = Math.PI;
-        this.rightKey.rotation = Math.PI/2;
-        this.leftKey.tint = 0x333333;
-        this.downKey.tint = 0x333333;
-        this.rightKey.tint = 0x333333;
+        this.anims.create({ 
+            key: 'cat_jump', 
+            frames: this.anims.generateFrameNames('cat_atlas', {      
+                prefix: 'cat_jump',
+                start: 1,
+                end: 4,
+                suffix: '.png',
+                zeroPad: 4 
+            }), 
+            frameRate: 10,
+            repeat: -1 
+        });
+
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
@@ -114,6 +133,28 @@ class Runner extends Phaser.Scene {
         this.physics.add.collider(this.tower, this.ground);
         this.physics.add.collider(this.cat, this.tower);
         this.tower.setVelocityX(-100);
+        
+        
+        //========================merge
+        // this.tree = new Tree(this, 100, game.config.height- 115, 'cat_tower', 0).setOrigin(0, 0);
+        // this.physics.add.collider(this.cat, this.tree);
+        //this.physics.add.overlap(this.cat, this.tree);
+        this.shootKeys = [
+			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+			// this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
+		];
+        this.bullets = this.physics.add.group({
+            defaultKey: 'laser',
+            maxSize: 10
+        });
+        //collision detection for the bullets
+        this.physics.add.collider(this.bullets,this.tower, function(bullet, tower){
+            enemy_dying_sfx.play();
+            tower.destroy();
+            bullet.destroy();
+        });
+
+
         // set up Scene switcher
         this.input.keyboard.on('keydown', (event) => {
             //console.log(event);
@@ -127,68 +168,56 @@ class Runner extends Phaser.Scene {
                 case '3':
                     this.scene.start('endScene');
                     break;
-                case '4':
-                    this.scene.start('variableJumpScene');
-                    break;
-                case '5':
-                    this.scene.start('runnerScene');
-                    break;
-                case '6':
-                    this.scene.start('pogoScene');
-                    break;
-                case '7':
-                    this.scene.start('asteroidsScene');
-                    break;
                 default:
                     break;
             }
         });
-        //========================merge
-        this.tree = new Tree(this, 100, game.config.height- 115, 'cat_tower', 0).setOrigin(0, 0);
-        this.physics.add.collider(this.cat, this.tree);
-        //this.physics.add.overlap(this.cat, this.tree);
+        
+        
+        
     }
-    checkCollision(cat, tree) {
-        // simple AABB checking
-        if (cat.x < tree.x + tree.width && 
-            cat.x + cat.width > tree.x && 
-            cat.y < tree.y + tree.height &&
-            cat.height + cat.y > tree. y) {
-                return true;
-        } else {
-            return false;
-        }
-}
+
     update() {
         // update tile sprites (tweak for more "speed")
         this.runner_backg.tilePositionX += this.SCROLL_SPEED;
         //this.tree.tilePositionX += this.SCROLL_SPEED;
         this.groundScroll.tilePositionX += this.SCROLL_SPEED;
+
         //this.tree.tilePositionX -= 4;
 		// check if alien is grounded
 	    this.cat.isGrounded = this.cat.body.touching.down;
-        this.tree.update();
-        this.laser.update();
+        // this.tree.update();
+        // this.laser.update();
+        if(!this.tower.destroyed){
+            this.physics.world.collide(this.tower, this.bullets, this.bulletCollision, null, this );
+            // console.log("this is the statment");
+        }
+        this.shootKeys.forEach(key => {
+			// Check if the key was just pressed, and if so -> fire the bullet
+			if(Phaser.Input.Keyboard.JustDown(key)) {
+				this.shoot();
+			}
+		});
+
 	    // if so, we have jumps to spare
 	    if(this.cat.isGrounded) {
             // this.alien.anims.play('walk', true);
             this.cat.anims.play('cat_run', true);
 	    	this.jumps = this.MAX_JUMPS;
 	    	this.jumping = false;
-            this.cat.body.velocity.x = 0;
+            // this.cat.body.velocity.x = 0;
 	    } else {
-            // this.cat.anims.play('jump');
+            // this.cat.anims.play('cat_jump');
 	    }
+        // if(Phaser.Input.Keyboard.DownDuration(cursors.a, 150))
         // allow steady velocity change up to a certain key down duration
         // see: https://photonstorm.github.io/phaser3-docs/Phaser.Input.Keyboard.html#.DownDuration__anchor
 	    if(this.jumps > 0 && Phaser.Input.Keyboard.DownDuration(cursors.up, 150)) {
+            this.cat.anims.play('cat_jump');
 	        this.cat.body.velocity.y = this.JUMP_VELOCITY;
-            this.cat.body.velocity.x = 10;
+            // this.cat.body.velocity.x = 10;
 	        this.jumping = true;
-	        this.upKey.tint = 0xFACADE;
-	    } else {
-	    	this.upKey.tint = 0xFFFFFF;
-	    }
+	    } 
         
         // finally, letting go of the UP key subtracts a jump
         // see: https://photonstorm.github.io/phaser3-docs/Phaser.Input.Keyboard.html#.UpDuration__anchor
@@ -197,24 +226,29 @@ class Runner extends Phaser.Scene {
 	    	this.jumping = false;
 	    }
         
-        if(this.checkCollision(this.cat, this.tree)) {
-            this.tree.reset();
-            // this.scene.start('endScene');
-        }
+        // if(this.checkCollision(this.cat, this.tree)) {
+        //     this.tree.reset();
+        //     // this.scene.start('endScene');
+        // }
         if(this.tower.x < 0){
             this.tower.x = game.config.width;
-            // console.log("this was true" + this.tower.x+ "" + this.cat.x);
             //this.tree.reset();
-            this.scene.start('endScene');
+            // this.scene.start('endScene');
 
         }
-        if(this.checkCollision2(this.cat, this.laser)) {
-            //this.laser.reset();
+        if(this.cat.x < 0){
             this.scene.start('endScene');
         }
+        // if(this.checkCollision2(this.cat, this.laser)) {
+        //     //this.laser.reset();
+        //     this.scene.start('endScene');
+        // }
 
        
     }
+    // bulletCollision(){
+    //     console.log("hello world");
+    // }
     checkCollision(cat, tree) {
         // simple AABB checking
         if (cat.x - 50 < tree.x + tree.width && 
