@@ -36,8 +36,6 @@ class Runner extends Phaser.Scene {
         // add tile sprite
         this.talltrees = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'runner_bg').setOrigin(0);
 
-        // print Scene name
-        this.add.text(game.config.width/2, 30, 'Scene 5: Endless Strollin\'', { font: '14px Futura', fill: '#00AA11' }).setOrigin(0.5);
 
         // make ground tiles group
         this.ground = this.add.group();
@@ -49,7 +47,7 @@ class Runner extends Phaser.Scene {
         }
         // put another tile sprite above the ground tiles
         this.groundScroll = this.add.tileSprite(0, game.config.height-tileSize, game.config.width, tileSize, 'groundScroll').setOrigin(0);
-
+        //this.tree = this.add.sprite(500, game.config.height- tileSize -22, 'cat_tower').setScale(SCALE);
         // set up my alien son 👽
         //this.alien = this.physics.add.sprite(120, game.config.height/2-tileSize, 'platformer_atlas', 'side').setScale(SCALE);
         this.cat = this.physics.add.sprite(120, game.config.height/2- tileSize, 'cat_atlas','cat_run0001').setScale(SCALE);
@@ -104,14 +102,16 @@ class Runner extends Phaser.Scene {
         // add physics collider
         //this.physics.add.collider(this.alien, this.ground);
         this.physics.add.collider(this.cat, this.ground);
-
+        this.physics.add.collider(this.cat, this.tree);
+        //this.physics.add.overlap(this.cat, this.tree);
     }
 
     update() {
         // update tile sprites (tweak for more "speed")
         this.talltrees.tilePositionX += this.SCROLL_SPEED;
+        //this.tree.tilePositionX += this.SCROLL_SPEED;
         this.groundScroll.tilePositionX += this.SCROLL_SPEED;
-
+        //this.tree.tilePositionX -= 4;
 		// check if alien is grounded
 	    this.cat.isGrounded = this.cat.body.touching.down;
         this.tree.update();
@@ -141,17 +141,18 @@ class Runner extends Phaser.Scene {
 	    	this.jumps--;
 	    	this.jumping = false;
 	    }
+        
         if(this.checkCollision(this.cat, this.tree)) {
             this.tree.reset();
-            this.scene.start('endScene');
+            //this.scene.start('endScene');
         }
 
        
     }
     checkCollision(cat, tree) {
         // simple AABB checking
-        if (cat.x < tree.x + tree.width && 
-            cat.x + cat.width > tree.x && 
+        if (cat.x - 100 < tree.x + tree.width && 
+            cat.x - 100 + cat.width > tree.x && 
             cat.y < tree.y + tree.height &&
             cat.height + cat.y > tree. y) {
                 return true;
