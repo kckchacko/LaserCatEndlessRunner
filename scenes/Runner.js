@@ -166,11 +166,13 @@ class Runner extends Phaser.Scene {
 	    }
         
         if(this.checkCollision(this.cat, this.tree)) {
-            this.tree.reset();
+            //this.tree.reset();
+            this.scene.start('endScene');
 
         }
         if(this.checkCollision2(this.cat, this.laser)) {
-            this.laser.reset();
+            //this.laser.reset();
+            this.scene.start('endScene');
         }
 
        
