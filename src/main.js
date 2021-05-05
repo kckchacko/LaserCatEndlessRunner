@@ -1,11 +1,10 @@
-// Nathan Altice
-// Updated: 7/1/20
-// Phaser 3 Movement Studies
-// Concepts: Arcade physics, atlas and atlasXML loading, atlas animation (custom and generated frames), physics world wrapping, physics body properties (velocity, acceleration, drag, max acceleration), keyboard (isDown, JustPressed, DownDuration, UpDuration)
-// Some mechanics inspired by and adapted from Game Mechanic Explorer https://gamemechanicexplorer.com
-// The two example atlases  are commercial assets and should not be used for your own projects - buy them from https://www.kenney.nl/assets :)
+// Noor, Kevin, Jordan
+// Updated: 5/5/21
+// LazerCat
+// Creative tilt: The art we implemented in the game is a unique take on endless runners. The sound design is also
+// appealing and something we're passionate about. We're proud of what we were able to accomplish in terms of programming. 
+// With the time we had, we were able to realize our ideas into a fun and functioning game.
 
-// tame the javashrek
 'use strict';
 
 // global variables
@@ -47,6 +46,7 @@ let treeCounter = 0;
 let enemyDestroyed = false;
 let enemyCounter = 0;
 let catDed = false;
+let score = 0;
 // const paddleVelocity = 150;
 // let level;
 // let highScore;
