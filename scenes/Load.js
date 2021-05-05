@@ -35,10 +35,12 @@ class Load extends Phaser.Scene {
         this.load.image('end_card', 'lasercat_endscreen.png');
         this.load.image('runner_bg', 'lasercat_bg.png');
         this.load.image('cat_tower','cat_tower.png');
+        //load font
+        this.load.bitmapFont('erasBold', 'font/ErasBoldITC.png', 'font/ErasBoldITC.xml')
     }
 
     create() {
         // ...and pass to the next Scene
-        this.scene.start('menuScene');
+        this.scene.start('laserCatRunnerScene');
     }
 }

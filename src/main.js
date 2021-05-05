@@ -11,7 +11,7 @@
 // global variables
 let cursors;
 let currentScene = 0;
-const SCALE = 0.5;
+const SCALE = 0.7;
 const tileSize = 35;
 let KeySPACE, rightKey;
 
