@@ -34,3 +34,20 @@ let config = {
 };
 
 let game = new Phaser.Game(config);
+let shots_left = 2;
+let towerDestroyed = false;
+let centerX = game.config.width/2;
+let centerY = game.config.height/2;
+let gameWidth = game.config.width;
+let gameHeight = game.config.height;
+let musicPlaying = false;
+let counter =0;
+let counterDelta = 0;
+let treeCounter = 0;
+let enemyDestroyed = false;
+let enemyCounter = 0;
+// const paddleVelocity = 150;
+// let level;
+// let highScore;
+// let newHighScore = false;
+// let cursors;

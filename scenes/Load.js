@@ -22,7 +22,7 @@ class Load extends Phaser.Scene {
         this.load.audio('sfx_intro', 'lasercatbg_intro.mp3');
         this.load.audio('cat_ded', 'lasercat_ded.mp3');
         this.load.audio('sfx_runnerLoopingBg','lasercat_bg.mp3');
-        this.load.audio('cat_shoot', 'shooting_laser.mp3');
+        this.load.audio('cat_shoot_sfx', 'shooting_laser.mp3');
         this.load.audio('cat_jump', 'jump.mp3');
         this.load.audio('enemy_ded', 'enemydie.mp3');
         this.load.atlas('platformer_atlas', 'kenny_sheet.png', 'kenny_sheet.json');
