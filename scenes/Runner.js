@@ -3,9 +3,10 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         super(scene, 600, game.config.height- 150, 'enemy_sprite', 0);
         scene.add.existing(this);   // add to existing scene
         scene.physics.add.existing(this);
-        this.setVelocityX(velocity);         // pixels per frame
+        this.setVelocityX(velocity);     
         // this.physics.add.collider(this, scene.ground);
         this.newEnemy = true; 
+        
     }
 
     update() {
@@ -16,12 +17,11 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         }
         if(this.x < -this.width){
             this.destroy();
+            score += 20;
             enemyCounter--;
             enemyDestroyed = true;
         }
     }
-    
-
     
 }
 class Tree extends Phaser.Physics.Arcade.Sprite {
@@ -201,6 +201,23 @@ class Runner extends Phaser.Scene {
         // this.tower.setVelocityX(-100);
         
         
+        // display score
+        let scoreConfig = {
+            fontFamily: 'Helvetica',
+            fontSize: '28px',
+            backgroundColor: '#bf2b21',
+            color: '#000000',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 100
+        }
+        let borderUISize = game.config.height / 15;
+        let borderPadding = borderUISize / 3;
+        this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding*2, score, scoreConfig);
+        
         this.shootKeys = [
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
 			// this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
@@ -245,10 +262,13 @@ class Runner extends Phaser.Scene {
 
         let cat_shoot_sfx = this.sound.add('cat_shoot_sfx');
         console.log("trees=", treeCounter);
-
         if(counter % 3600 == 0){
             console.log('something')
             counter = 0;
+        }
+        if (enemyDestroyed == true) {
+            score += 20;
+            this.scoreLeft.text = score;
         }
         if(shots_left <= 0){
             this.time.delayedCall(2000, () =>{

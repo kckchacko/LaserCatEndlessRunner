@@ -46,6 +46,7 @@ let counterDelta = 0;
 let treeCounter = 0;
 let enemyDestroyed = false;
 let enemyCounter = 0;
+let score = 0;
 // const paddleVelocity = 150;
 // let level;
 // let highScore;
