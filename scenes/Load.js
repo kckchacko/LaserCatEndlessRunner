@@ -32,6 +32,7 @@ class Load extends Phaser.Scene {
         this.load.atlasXML('shooter_atlas', 'shooter_sheet.png', 'shooter_sheet.xml');
         //loaded images
         this.load.image('title_card', 'lasercat_title.png');
+        this.load.image('laser', 'laser.png');
         this.load.image('end_card', 'lasercat_endscreen.png');
         this.load.image('runner_bg', 'lasercat_bg.png');
         this.load.image('cat_tower','cat_tower.png');

@@ -20,6 +20,28 @@ class Tree extends Phaser.GameObjects.Sprite {
     }
 }
 
+class laser extends Phaser.GameObjects.Sprite {
+    constructor(scene, x, y, texture, frame, pointValue) {
+        super(scene, x, y, texture, frame);
+        scene.add.existing(this);   // add to existing scene
+        this.moveSpeed = 7;         // pixels per frame
+    }
+
+    update() {
+        // move spaceship left
+        this.x -= this.moveSpeed;
+        // wrap around from left edge to right edge
+        if(this.x <= 0 - this.width) {
+            this.reset();
+        } 
+    }
+
+    // position reset
+    reset() {
+        this.x = game.config.width;
+    }
+}
+
 class Runner extends Phaser.Scene {
     constructor() {
         super('laserCatRunnerScene');
@@ -36,7 +58,6 @@ class Runner extends Phaser.Scene {
         // add tile sprite
         this.talltrees = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'runner_bg').setOrigin(0);
 
-
         // make ground tiles group
         this.ground = this.add.group();
         for(let i = 0; i < game.config.width; i += tileSize) {
@@ -52,7 +73,8 @@ class Runner extends Phaser.Scene {
         //this.alien = this.physics.add.sprite(120, game.config.height/2-tileSize, 'platformer_atlas', 'side').setScale(SCALE);
         this.cat = this.physics.add.sprite(120, game.config.height/2- tileSize, 'cat_atlas','cat_run0001').setScale(SCALE);
         //this.tree = this.add.sprite(120, game.config.height- tileSize, 'cat_tower').setScale(SCALE);
-        this.tree = new Tree(this, 600, game.config.height- 115, 'cat_tower', 0).setOrigin(0, 0);
+        this.tree = new Tree(this, 500, game.config.height- 100, 'cat_tower', 0).setOrigin(0, 0);
+        this.laser = new laser(this, 700, game.config.height- 300, 'laser', 0).setOrigin(0, 0);
         // create cat animations from texture atlas
         // see: https://photonstorm.github.io/phaser3-docs/Phaser.Types.Animations.html#toc1__anchor
         // key: string, frames: array, frameRate: int, repeat: int
@@ -115,6 +137,7 @@ class Runner extends Phaser.Scene {
 		// check if alien is grounded
 	    this.cat.isGrounded = this.cat.body.touching.down;
         this.tree.update();
+        this.laser.update();
 	    // if so, we have jumps to spare
 	    if(this.cat.isGrounded) {
             //this.cat.anims.play('walk', true);
@@ -144,15 +167,29 @@ class Runner extends Phaser.Scene {
         
         if(this.checkCollision(this.cat, this.tree)) {
             this.tree.reset();
-            //this.scene.start('endScene');
+
+        }
+        if(this.checkCollision2(this.cat, this.laser)) {
+            this.laser.reset();
         }
 
        
     }
     checkCollision(cat, tree) {
         // simple AABB checking
+        if (cat.x - 50 < tree.x + tree.width && 
+            cat.x - 50 + cat.width > tree.x && 
+            cat.y < tree.y + tree.height &&
+            cat.height + cat.y > tree. y) {
+                return true;
+        } else {
+            return false;
+        }
+    }
+    checkCollision2(cat, tree) {
+        // simple AABB checking
         if (cat.x - 100 < tree.x + tree.width && 
-            cat.x - 100 + cat.width > tree.x && 
+            cat.x - 100+ cat.width > tree.x && 
             cat.y < tree.y + tree.height &&
             cat.height + cat.y > tree. y) {
                 return true;
