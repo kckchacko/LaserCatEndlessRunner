@@ -1,3 +1,29 @@
+class Enemy extends Phaser.Physics.Arcade.Sprite {
+    constructor(scene, velocity) {
+        super(scene, 600, game.config.height- 150, 'enemy_sprite', 0);
+        scene.add.existing(this);   // add to existing scene
+        scene.physics.add.existing(this);
+        this.setVelocityX(velocity);         // pixels per frame
+        // this.physics.add.collider(this, scene.ground);
+        this.newEnemy = true; 
+    }
+
+    update() {
+        if(this.newEnemy && this.x < centerX) {
+            this.newEnemy = false;
+            // (recursively) call parent scene method from this context
+            this.scene.addEnemy();
+        }
+        if(this.x < -this.width){
+            this.destroy();
+            enemyCounter--;
+            enemyDestroyed = true;
+        }
+    }
+    
+
+    
+}
 class Tree extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, velocity) {
         super(scene, 600, game.config.height- 100, 'cat_tower', 0);
@@ -39,7 +65,7 @@ class Runner extends Phaser.Scene {
         }
     }
     addTree(){
-        if(treeCounter < 2 && (Math.random()*10 > 9)){
+        if(treeCounter < 2 && (Math.random()*10 > 5)){
             let tree = new Tree(this,-200);
             this.treeGroup.add(tree);    
             treeCounter++;
@@ -50,13 +76,12 @@ class Runner extends Phaser.Scene {
         
     }
     addEnemy(){
-        if(enemyDestroyed){
-            this.enemy = this.physics.add.sprite(600, game.config.height/2, 'cat_atlas','enemy_walk0001.png').setScale(.90)
+        // && Math.random()*10 > 7
+        if(enemyCounter < 2){
+            let enem = new Enemy(this, -100 )
+            this.enemyGroup.add(enem);
             enemyCounter++;
-            this.enemy.setVelocityX(-100);
-            this.physics.add.collider(this.enemy, this.ground);
-            this.physics.add.collider(this.enemy, this.cat);
-            this.physics.add.collider(this.enemy, this.bullts)
+            enemyDestroyed = false;
         }
     }
     create() {
@@ -97,17 +122,8 @@ class Runner extends Phaser.Scene {
         this.groundScroll = this.add.tileSprite(0, game.config.height-tileSize, game.config.width, tileSize, 'groundScroll').setOrigin(0);
         
         this.cat = this.physics.add.sprite(120, game.config.height/2, 'cat_atlas','cat_run0001.png').setScale(SCALE)
-        // this.enemy = this.physics.add.sprite(600, game.config.height/2, 'cat_atlas','enemy_walk0001.png').setScale(.90)
-        // this.enemy.setVelocityX(-100);
-        // this.physics.add.collider(this.enemy, this.ground);
-        // this.physics.add.collider(this.enemy, this.cat);
-        let enemy = this.addEnemy();
-        // this.tower = this.physics.add.sprite(400, game.config.height/2, 'cat_tower')
-        // this.tower.destroyed = false;
         this.cat.destroyed = false; 
         this.cat.shooting = false; 
-    
-
         //trying to use the tower class as an object////
         this.treeGroup = this.add.group({
             runChildUpdate: true    // make sure update runs on group children
@@ -117,27 +133,27 @@ class Runner extends Phaser.Scene {
         this.time.delayedCall(2500, () => { 
             this.addTree(); 
         });
-        
+
+        this.enemyGroup = this.add.group({
+            runChildUpdate: true // make sure update runs on
+        });
+        this.time.delayedCall(3500, () => {
+            this.addEnemy();
+        })
+
+        // this.addEnemy();
+        this.physics.add.collider(this.cat, this.ground);
         this.physics.add.collider(this.treeGroup, this.ground);
+        this.physics.add.collider(this.enemyGroup,this.ground);
         this.physics.add.collider(this.cat, this.treeGroup);
-        
+        this.physics.add.collider(this.cat, this.enemyGroup);
+
         this.spawnTreeInc = this.time.addEvent({
             delay: 1000,
             callback: this.addTree(),
             callbackScope: this,
             loop: true
         })
-
-        ///========================================================vvv changes
-        // this.cat = this.physics.add.sprite(120, game.config.height/2- tileSize, 'cat_atlas','cat_run0001').setScale(SCALE);
-        // this.tower1 = this.add.sprite(120, game.config.height- tileSize, 'cat_tower').setScale(SCALE);
-        //  this.tree = new Tree(this, 500, game.config.height- 100, 'cat_tower', 0).setOrigin(0, 0);
-        //  this.tree.setVelocityX(-100);
-        //  this.physics.add.collider(this.tree, this.ground);
-        //  this.physics.add.collider(this.tree, this.cat);
-        //  this.tree.setVelocityX(-10);
-        // this.tree.update();
-       //===================
        
         // create cat animations from texture atlas
         this.anims.create({ 
@@ -180,7 +196,6 @@ class Runner extends Phaser.Scene {
         cursors = this.input.keyboard.createCursorKeys();
 
         // add physics collider
-        this.physics.add.collider(this.cat, this.ground);
         // this.physics.add.collider(this.tower, this.ground);
         // this.physics.add.collider(this.cat, this.tower);
         // this.tower.setVelocityX(-100);
@@ -194,15 +209,8 @@ class Runner extends Phaser.Scene {
             defaultKey: 'laser',
             // maxSize: 10
         });
-        //collision detection for the bullets
-        // this.physics.add.collider(this.bullets,this.treeGroup, function(bullet, tower){
-        //     treeCounter--;
-        //     towerDestroyed = true;
-        //     enemy_dying_sfx.play();
-        //     tower.destroy();
-        //     bullet.destroy();
-        // });
-        this.physics.add.collider(this.bullets,this.enemy, function(bullet, enemy){
+
+        this.physics.add.collider(this.bullets,this.enemyGroup, function(bullet, enemy){
             treeCounter--;
             enemyDestroyed = true;
             enemy_dying_sfx.play();
@@ -249,14 +257,14 @@ class Runner extends Phaser.Scene {
             })
         }
         if(treeCounter < 2){
-            if((Math.random()*10 > 9) && (counter-counterDelta) > 500){
+            if((Math.random()*10 > 6) && (counter-counterDelta) > 500){
                 counterDelta = counter;
                 console.log("counterDelta is", counterDelta);
                 this.addTree();
                 towerDestroyed = false;
             }
         }
-        if(enemyDestroyed && enemyCounter < 1 && (Math.random()*10 > 9) && (counter-counterDelta) > 700){
+        if( (Math.random()*10 > 9) ){
             counterDelta = counter;
             this.addEnemy();
             enemyDestroyed = false;

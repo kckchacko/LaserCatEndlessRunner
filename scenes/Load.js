@@ -34,6 +34,7 @@ class Load extends Phaser.Scene {
         this.load.image('end_card', 'lasercat_endscreen.png');
         this.load.image('runner_bg', 'lasercat_bg.png');
         this.load.image('cat_tower','cat_tower.png');
+        this.load.image('enemy_sprite', 'enemy.png');
         //load font
         this.load.bitmapFont('erasBold', 'font/ErasBoldITC.png', 'font/ErasBoldITC.xml')
     }
