@@ -4,6 +4,7 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
         scene.add.existing(this);   // add to existing scene
         scene.physics.add.existing(this);
         this.setVelocityX(velocity);         // pixels per frame
+        this.anims.play('enemy_walk', true);
         // this.physics.add.collider(this, scene.ground);
         this.newEnemy = true; 
     }
@@ -20,7 +21,9 @@ class Enemy extends Phaser.Physics.Arcade.Sprite {
             enemyDestroyed = true;
         }
     }
-    
+    death(){
+        this.anims.play('enemy_die', true);
+    }
 
     
 }
@@ -70,7 +73,7 @@ class Runner extends Phaser.Scene {
             this.treeGroup.add(tree);    
             treeCounter++;
             towerDestroyed = false;
-            console.log("we are adding a tree")
+            // console.log("we are adding a tree")
         }
         
         
@@ -79,6 +82,7 @@ class Runner extends Phaser.Scene {
         // && Math.random()*10 > 7
         if(enemyCounter < 2){
             let enem = new Enemy(this, -100 )
+            // this.enem.anims.play('enemy_walk', true);
             this.enemyGroup.add(enem);
             enemyCounter++;
             enemyDestroyed = false;
@@ -94,6 +98,7 @@ class Runner extends Phaser.Scene {
 
         // add tile sprite
         this.runner_backg = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'runner_bg').setOrigin(0);
+        let cat_ded = this.sound.add('cat_ded');
 
         // play music 
         // let runner_bgm = this.sound.add('sfx_runnerLoopingBg');
@@ -122,6 +127,9 @@ class Runner extends Phaser.Scene {
         this.groundScroll = this.add.tileSprite(0, game.config.height-tileSize, game.config.width, tileSize, 'groundScroll').setOrigin(0);
         
         this.cat = this.physics.add.sprite(120, game.config.height/2, 'cat_atlas','cat_run0001.png').setScale(SCALE)
+
+        this.enemy = this.physics.add.sprite(120, game.config.height/2, 'cat_atlas','cat_run0001.png').setScale(SCALE)
+        this.enemy.anims.play("enemy_die", false);
         this.cat.destroyed = false; 
         this.cat.shooting = false; 
         //trying to use the tower class as an object////
@@ -137,16 +145,16 @@ class Runner extends Phaser.Scene {
         this.enemyGroup = this.add.group({
             runChildUpdate: true // make sure update runs on
         });
-        this.time.delayedCall(3500, () => {
-            this.addEnemy();
-        })
+        // this.time.delayedCall(3500, () => {
+        //     this.addEnemy();
+        // })
 
         // this.addEnemy();
         this.physics.add.collider(this.cat, this.ground);
         this.physics.add.collider(this.treeGroup, this.ground);
         this.physics.add.collider(this.enemyGroup,this.ground);
         this.physics.add.collider(this.cat, this.treeGroup);
-        this.physics.add.collider(this.cat, this.enemyGroup);
+        // this.physics.add.collider(this.cat, this.enemyGroup);
 
         this.spawnTreeInc = this.time.addEvent({
             delay: 1000,
@@ -192,30 +200,57 @@ class Runner extends Phaser.Scene {
             frameRate: 30,
             repeat: -1 
         });
+        this.anims.create({ 
+            key: 'enemy_walk', 
+            frames: this.anims.generateFrameNames('cat_atlas', {      
+                prefix: 'enemy_walk',
+                start: 1,
+                end: 6,
+                suffix: '.png',
+                zeroPad: 4 
+            }), 
+            frameRate: 10,
+            repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'enemy_die', 
+            frames: this.anims.generateFrameNames('cat_atlas', {      
+                prefix: 'man_die',
+                start: 1,
+                end: 6,
+                suffix: '.png',
+                zeroPad: 4 
+            }), 
+            frameRate: 10,
+            repeat: -1 
+        });
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
-
-        // add physics collider
-        // this.physics.add.collider(this.tower, this.ground);
-        // this.physics.add.collider(this.cat, this.tower);
-        // this.tower.setVelocityX(-100);
-        
         
         this.shootKeys = [
 			this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
 			// this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 		];
+        this.jumpKeys = [
+            this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
+        ];
         this.bullets = this.physics.add.group({
             defaultKey: 'laser',
             // maxSize: 10
         });
 
         this.physics.add.collider(this.bullets,this.enemyGroup, function(bullet, enemy){
-            treeCounter--;
+            enemyCounter--;
             enemyDestroyed = true;
             enemy_dying_sfx.play();
             enemy.destroy();
             bullet.destroy();
+            console.log("enemy", enemy.x);
+        });
+        this.physics.add.collider(this.cat, this.enemyGroup, function(cat, enemy){
+            cat_ded.play();
+            enemy.destroy();
+            catDed = true;
         });
 
         // set up Scene switcher
@@ -242,9 +277,12 @@ class Runner extends Phaser.Scene {
     
 
     update() {  
-
+        let cat_ded = this.sound.add('cat_ded');
+        if(catDed ){
+            cat_ded.play();
+            this.scene.start('endScene');
+        }
         let cat_shoot_sfx = this.sound.add('cat_shoot_sfx');
-        console.log("trees=", treeCounter);
 
         if(counter % 3600 == 0){
             console.log('something')
@@ -252,7 +290,6 @@ class Runner extends Phaser.Scene {
         }
         if(shots_left <= 0){
             this.time.delayedCall(2000, () =>{
-                // console.log('just checking');
                 shots_left = 2;
             })
         }
@@ -264,11 +301,15 @@ class Runner extends Phaser.Scene {
                 towerDestroyed = false;
             }
         }
-        if( (Math.random()*10 > 9) ){
-            counterDelta = counter;
-            this.addEnemy();
-            enemyDestroyed = false;
+        if(enemyCounter < 1){
+            if( (Math.random()*10 > 9) ){
+                counterDelta = counter;
+                this.addEnemy();
+                enemyCounter++;
+                enemyDestroyed = false;
+            }
         }
+        
     
         
         // update tile sprites (tweak for more "speed")
@@ -301,18 +342,15 @@ class Runner extends Phaser.Scene {
             this.cat.anims.play('cat_run', true);
 	    	this.jumps = this.MAX_JUMPS;
 	    	this.jumping = false;
-            // this.cat.body.velocity.x = 0;
-	    } else {
-            // this.cat.anims.play('cat_jump');
-	    }
-        
-	    if(this.jumps > 0 && Phaser.Input.Keyboard.DownDuration(cursors.up, 150)) {
-            this.cat.anims.play('cat_jump');
-	        this.cat.body.velocity.y = this.JUMP_VELOCITY;
-            
-	        this.jumping = true;
 	    } 
-        
+        this.jumpKeys.forEach(key => {
+            if(this.jumps > 0 && Phaser.Input.Keyboard.DownDuration(key, 150)) {
+                this.cat.anims.play('cat_jump');
+                this.cat.body.velocity.y = this.JUMP_VELOCITY;
+                
+                this.jumping = true;
+            } 
+        });
         // finally, letting go of the UP key subtracts a jump
         // see: https://photonstorm.github.io/phaser3-docs/Phaser.Input.Keyboard.html#.UpDuration__anchor
 	    if(this.jumping && Phaser.Input.Keyboard.UpDuration(cursors.up)) {
@@ -322,33 +360,11 @@ class Runner extends Phaser.Scene {
         
     
         if(this.cat.x < 0){
+            cat_ded.play();
             this.scene.start('endScene');
         }
         counter++;
     }
 
-    checkCollision(cat, tree) {
-        // simple AABB checking
-        if (cat.x - 50 < tree.x + tree.width && 
-            cat.x - 50 + cat.width > tree.x && 
-            cat.y < tree.y + tree.height &&
-            cat.height + cat.y > tree. y) {
-                return true;
-        } else {
-            return false;
-        }
-    }
-    checkCollision2(cat, tree) {
-        // simple AABB checking
-        if (cat.x - 100 < tree.x + tree.width && 
-            cat.x - 100+ cat.width > tree.x && 
-            cat.y < tree.y + tree.height &&
-            cat.height + cat.y > tree. y) {
-                return true;
-        } else {
-            return false;
-        }
-        
-    }
     
 }

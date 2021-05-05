@@ -26,7 +26,7 @@ class Load extends Phaser.Scene {
         this.load.audio('cat_jump', 'jump.mp3');
         this.load.audio('enemy_ded', 'enemydie.mp3');
         this.load.atlas('platformer_atlas', 'kenny_sheet.png', 'kenny_sheet.json');
-        this.load.image('groundScroll', 'ground.png');
+        this.load.image('groundScroll', 'laser_cat_ground.png');
         this.load.atlasXML('shooter_atlas', 'shooter_sheet.png', 'shooter_sheet.xml');
         //loaded images
         this.load.image('title_card', 'lasercat_title.png');
@@ -41,6 +41,6 @@ class Load extends Phaser.Scene {
 
     create() {
         // ...and pass to the next Scene
-        this.scene.start('laserCatRunnerScene');
+        this.scene.start('menuScene');
     }
 }
