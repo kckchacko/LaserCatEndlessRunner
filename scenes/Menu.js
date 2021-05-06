@@ -20,6 +20,7 @@ class Menu extends Phaser.Scene {
             switch(event.key) {
                 case '1':
                     this.scene.start('laserCatRunnerScene');
+                    title_bgm.stop();
                     break;
                 default:
                     break;

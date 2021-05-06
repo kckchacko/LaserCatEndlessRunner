@@ -126,6 +126,8 @@ class Runner extends Phaser.Scene {
         
         this.cat = this.physics.add.sprite(120, game.config.height/2, 'cat_atlas','cat_run0001.png').setScale(SCALE)
 
+        this.enemy = this.physics.add.sprite(120, game.config.height/2, 'cat_atlas','cat_run0001.png').setScale(SCALE)
+       
         this.cat.destroyed = false; 
         this.cat.shooting = false; 
         //trying to use the tower class as an object////
@@ -159,6 +161,13 @@ class Runner extends Phaser.Scene {
             loop: true
         })
        
+
+        this.spawnEnemy = this.time.addEvent({
+            delay: 1000,
+            callback: this.addEnemy(),
+            callbackScope: this,
+            loop: true
+        })
         // create cat animations from texture atlas
         this.anims.create({ 
             key: 'cat_run', 
