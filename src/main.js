@@ -22,7 +22,7 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            debug: true,
+            debug: false,
             gravity: {
                 x: 0,
                 y: 0
@@ -47,8 +47,5 @@ let enemyDestroyed = false;
 let enemyCounter = 0;
 let catDed = false;
 let score = 0;
-// const paddleVelocity = 150;
-// let level;
-// let highScore;
-// let newHighScore = false;
-// let cursors;
+let w = game.config.width;
+let h = game.config.height;
